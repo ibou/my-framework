@@ -10,9 +10,9 @@ $routes->add(
     'hello',
     new Route(
         '/hello/{name}', [
-                                 'name' => 'World',
-                                 '_controller' => 'App\Controller\GreatingController::hello',
-                             ]
+                           'name' => 'World',
+                           '_controller' => 'App\Controller\GreatingController::hello',
+                       ]
     )
 );
 $routes->add(
@@ -30,6 +30,18 @@ $routes->add(
         '/a-propos',
         [
             '_controller' => 'App\Controller\PageController::about',
+        ]
+    )
+);
+
+$routes->add(
+    'leap_year',
+    new Route(
+        '/is_leap_year/{year}',
+        [
+            '_controller' => 'App\Controller\LeapYearController::index',
+            'year' => null,
+            'message' => '',
         ]
     )
 );

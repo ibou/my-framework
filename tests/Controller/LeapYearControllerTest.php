@@ -9,41 +9,35 @@ use Symfony\Component\HttpKernel\Controller\ControllerResolver;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 
-class IndexTest extends TestCase
+class LeapYearControllerTest extends TestCase
 {
     protected Simplex $framework;
     
     
     protected function setUp(): void
     {
-        $routes = require __DIR__.'/../src/routes.php';
+        $routes = require __DIR__.'/../../src/routes.php';
         $urlMatcher = new UrlMatcher($routes, new RequestContext());
         $this->framework = new Framework\Simplex($urlMatcher, new ControllerResolver(), new ArgumentResolver());
     }
     
-    
-    public function testHello()
+    public function testIsALeapYearDefault()
     {
-        $request = Request::create("/hello/Ibou");
+        $request = Request::create('/is_leap_year');
         $response = $this->framework->handle($request);
-        $this->assertEquals('Hello Ibou', $response->getContent());
-    
-        $request = Request::create("/hello");
-        $response = $this->framework->handle($request);
-        $this->assertEquals('Hello World', $response->getContent());
+        $this->assertStringContainsStringIgnoringCase('Nope, this is not a leap year.', $response->getContent());
     }
     
-    public function testBye()
+    public function testIsALeapYearWithParamsOk()
     {
-        $request = Request::create("/bye");
+        $request = Request::create('/is_leap_year/2000');
         $response = $this->framework->handle($request);
-        $this->assertEquals('Goodbye', $response->getContent());
+        $this->assertStringContainsStringIgnoringCase('Yep, this is a leap year!', $response->getContent());
     }
-    
-    public function testAbout()
+    public function testIsALeapYearWithParamKO()
     {
-        $request = Request::create("/a-propos");
+        $request = Request::create('/is_leap_year/2001');
         $response = $this->framework->handle($request);
-        $this->assertStringContainsStringIgnoringCase('Une page about est générée, cool !', $response->getContent());
+        $this->assertStringContainsStringIgnoringCase('Nope, this is not a leap year.', $response->getContent());
     }
 }
