@@ -1,7 +1,6 @@
 <?php
 
-use App\Controller\GreatingController;
-use App\Controller\PageController;
+
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -11,9 +10,9 @@ $routes->add(
     'hello',
     new Route(
         '/hello/{name}', [
-                           'name' => 'World',
-                           '_controller' => [new GreatingController, 'hello'],
-                       ]
+                                 'name' => 'World',
+                                 '_controller' => 'App\Controller\GreatingController::hello',
+                             ]
     )
 );
 $routes->add(
@@ -21,7 +20,7 @@ $routes->add(
     new Route(
         '/bye',
         [
-            '_controller' => [new GreatingController, 'bye'],
+            '_controller' => 'App\Controller\GreatingController::bye',
         ]
     )
 );
@@ -30,7 +29,7 @@ $routes->add(
     new Route(
         '/a-propos',
         [
-            '_controller' => [new PageController, 'about'],
+            '_controller' => 'App\Controller\PageController::about',
         ]
     )
 );
