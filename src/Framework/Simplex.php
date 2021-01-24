@@ -34,19 +34,19 @@ class Simplex
     
     public function handle(Request $request): Response
     {
-        
         $this->matcher->getContext()->fromRequest($request);
         
         try {
+            
             $request->attributes->add($this->matcher->match($request->getPathInfo()));
             $controller = $this->controllerResolver->getController($request);
             $arguments = $this->argumentResolver->getArguments($request, $controller);
+            
             return call_user_func_array($controller, $arguments);
         } catch (ResourceNotFoundException $exception) {
             return new Response('La page nexiste pas', 404);
         } catch (\Exception $exception) {
             return new Response('Une error est arrivée', 500);
         }
-        
     }
 }
