@@ -18,16 +18,12 @@ $routes = require __DIR__.'/../src/routes.php';
 $context = new RequestContext();
 $context->fromRequest($request);
 $urlMatcher = new UrlMatcher($routes, $context);
-
-
 try {
-    ob_start();
-    extract($urlMatcher->match($request->getPathInfo()), EXTR_SKIP);
-    include __DIR__.'/../src/pages/'.$_route.'.php';
-    $response = new Response(ob_get_clean());
+    $request->attributes->add($urlMatcher->match($request->getPathInfo()));
+    $response = call_user_func($request->attributes->get('_controller'), $request);
 } catch (ResourceNotFoundException $exception) {
     $response = new Response('La page nexiste pas', 404);
-}catch (\Exception $exception){
+} catch (\Exception $exception) {
     $response = new Response('Une error est arrivée', 500);
 }
 
