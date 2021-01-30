@@ -3,6 +3,7 @@
 
 use Framework\Simplex;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ControllerResolver;
@@ -13,21 +14,12 @@ class IndexTest extends TestCase
 {
     protected Simplex $framework;
     
-    
-    protected function setUp(): void
-    {
-        $routes = require __DIR__.'/../src/routes.php';
-        $urlMatcher = new UrlMatcher($routes, new RequestContext());
-        $this->framework = new Framework\Simplex($urlMatcher, new ControllerResolver(), new ArgumentResolver());
-    }
-    
-    
     public function testHello()
     {
         $request = Request::create("/hello/Ibou");
         $response = $this->framework->handle($request);
         $this->assertEquals('Hello Ibou', $response->getContent());
-    
+        
         $request = Request::create("/hello");
         $response = $this->framework->handle($request);
         $this->assertEquals('Hello World', $response->getContent());
@@ -45,5 +37,18 @@ class IndexTest extends TestCase
         $request = Request::create("/a-propos");
         $response = $this->framework->handle($request);
         $this->assertStringContainsStringIgnoringCase('Une page about est générée, cool !', $response->getContent());
+    }
+    
+    protected function setUp(): void
+    {
+        $routes = require __DIR__.'/../src/routes.php';
+        $urlMatcher = new UrlMatcher($routes, new RequestContext());
+        $dispatcher = new EventDispatcher();
+        $this->framework = new Framework\Simplex(
+            $dispatcher,
+            $urlMatcher,
+            new ControllerResolver(),
+            new ArgumentResolver()
+        );
     }
 }

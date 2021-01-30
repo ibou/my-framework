@@ -3,12 +3,12 @@
 
 use App\Controller\LeapYearController;
 use Framework\Simplex;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolver;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Symfony\Component\Routing\RequestContext;
 
@@ -29,7 +29,7 @@ class SimplexTest extends \PHPUnit\Framework\TestCase
         $controllerResolver = $this->createMock(ControllerResolver::class);
         
         $argumentResolver = $this->createMock(ArgumentResolverInterface::class);
-        
+        $dispatcher = $this->createMock(EventDispatcher::class);
         $matcher
             ->expects($this->once())
             ->method('match')
@@ -40,7 +40,8 @@ class SimplexTest extends \PHPUnit\Framework\TestCase
             ->method('getContext')
             ->will($this->returnValue($this->createMock(RequestContext::class)));
         
-        return new Simplex($matcher, $controllerResolver, $argumentResolver);
+        
+        return new Simplex($dispatcher, $matcher, $controllerResolver, $argumentResolver);
     }
     
     public function testErrorHandling()
@@ -53,7 +54,7 @@ class SimplexTest extends \PHPUnit\Framework\TestCase
     public function testControllerResponse()
     {
         $matcher = $this->createMock(UrlMatcherInterface::class);
-        
+        $dispatcher = $this->createMock(EventDispatcher::class);
         $matcher
             ->expects($this->once())
             ->method('match')
@@ -73,7 +74,7 @@ class SimplexTest extends \PHPUnit\Framework\TestCase
             ->method('getContext')
             ->will($this->returnValue($this->createMock(RequestContext::class)));
         
-        $framework = new Simplex($matcher, new ControllerResolver(), new ArgumentResolver());
+        $framework = new Simplex($dispatcher, $matcher, new ControllerResolver(), new ArgumentResolver());
         
         $request = Request::create('/is_leap_year');
         $response = $framework->handle($request);

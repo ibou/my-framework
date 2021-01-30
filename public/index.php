@@ -3,6 +3,7 @@
 error_reporting(E_ALL);
 ini_set("display_errors", 1);
 
+use Framework\Event\RequestEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
@@ -23,23 +24,7 @@ $controllerResolver = new ControllerResolver();
 $argumentResolver = new ArgumentResolver();
 
 $dispatcher = new EventDispatcher();
-$dispatcher->addListener('kernel.request', function (){
-    dump("hollla request");
-});
 
-$dispatcher->addListener('kernel.controller', function (){
-    dump("hollla controller");
-});
-
-$dispatcher->addListener('kernel.arguments', function (){
-    dump("hollla arguments");
-});
-
-
-
-$dispatcher->addListener('kernel.response', function (){
-    dump("hollla response");
-});
 $framework = new Framework\Simplex($dispatcher, $urlMatcher, new ControllerResolver(), new ArgumentResolver());
 $response = $framework->handle($request);
 

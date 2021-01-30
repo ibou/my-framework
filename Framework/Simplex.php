@@ -2,6 +2,9 @@
 
 namespace Framework;
 
+use Framework\Event\ControllerEvent;
+use Framework\Event\RequestEvent;
+use Framework\Event\ResponseEvent;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -44,17 +47,20 @@ class Simplex
     {
         $this->matcher->getContext()->fromRequest($request);
         
-        $this->dispatcher->dispatch(new Event(), 'kernel.request');
-        
         try {
+            
             $request->attributes->add($this->matcher->match($request->getPathInfo()));
-            $this->dispatcher->dispatch(new Event(), 'kernel.controller');
+            $this->dispatcher->dispatch(new RequestEvent($request), 'kernel.request');
+    
             $controller = $this->controllerResolver->getController($request);
+            $this->dispatcher->dispatch(new ControllerEvent($request, $controller), 'kernel.controller');
+            
             $this->dispatcher->dispatch(new Event(), 'kernel.arguments');
             $arguments = $this->argumentResolver->getArguments($request, $controller);
             
             $response = call_user_func_array($controller, $arguments);
-            $this->dispatcher->dispatch(new Event(), 'kernel.response');
+            
+            $this->dispatcher->dispatch(new ResponseEvent($response), 'kernel.response');
             return $response;
         } catch (ResourceNotFoundException $exception) {
             return new Response('La page nexiste pas', 404);
